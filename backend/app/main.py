@@ -35,16 +35,17 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configure CORS Middleware for Localhost and Production Vercel domains
+# Configure CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
-        "https://ecocode-analytics.vercel.app",  # আপনার Vercel ডোমেইন
+        "https://ecocode-amber.vercel.app",       # আপনার লাইভ Vercel ডোমেন
+        "https://ecocode-analytics.vercel.app",   # সেকেন্ডারি Vercel ডোমেন
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",  # সব vercel preview/deployment URLs সাপোর্ট করবে
+    allow_origin_regex=r"^https://.*\.vercel\.app$",  # vercel-এর সব ডোমেন ও প্রিভিউ ব্রাঞ্চ
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -105,5 +106,5 @@ async def general_exception_handler(request: Request, exc: Exception):
         },
     )
 
-# Include API Router
-app.include_router(api_v1_router, prefix="/api")
+# Include API Router under /api/v1 prefix
+app.include_router(api_v1_router, prefix="/api/v1")
