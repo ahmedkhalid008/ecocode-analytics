@@ -7,12 +7,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1 import api_v1_router
 from app.core.config import settings
-from app.db.session import engine
-# আপনার মডেলগুলোর Base ইমপোর্ট করা হচ্ছে (যাতে সব টেবিল স্বয়ংক্রিয় তৈরি হতে পারে)
-try:
-    from app.models.base import Base
-except ImportError:
-    from app.db.base import Base
+from app.core.database import async_engine
+from app.models import Base
 
 openapi_tags = [
     {
@@ -33,12 +29,24 @@ openapi_tags = [
     },
 ]
 
-# Lifespan: অ্যাপ চালু হওয়ার সময় ডাটাবেসে টেবিল না থাকলে অটোমেটিক তৈরি করবে
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """
+    Application Lifespan Context Manager.
+    Ensures database tables are initialized if create_tables.py was not run prior to startup.
+    """
+    try:
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        print(f"Lifespan DB table check info: {e}")
     yield
+    try:
+        await async_engine.dispose()
+    except Exception:
+        pass
+
 
 app = FastAPI(
     title="EcoCode Analytics API",
@@ -50,17 +58,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS Middleware
+# Configure CORS Middleware for Vercel production and local environments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
-        "https://ecocode-amber.vercel.app",       # আপনার লাইভ Vercel ডোমেন
-        "https://ecocode-analytics.vercel.app",   # সেকেন্ডারি Vercel ডোমেন
+        "https://ecocode-amber.vercel.app",
+        "https://ecocode-analytics.vercel.app",
     ],
-    allow_origin_regex=r"^https://.*\.vercel\.app$",  # vercel-এর সব ডোমেন ও প্রিভিউ ব্রাঞ্চ
+    allow_origin_regex=r"^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -121,5 +129,5 @@ async def general_exception_handler(request: Request, exc: Exception):
         },
     )
 
-# Include API Router under /api
+# Include API Router under /api prefix
 app.include_router(api_v1_router, prefix="/api")
