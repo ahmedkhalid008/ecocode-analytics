@@ -10,7 +10,21 @@ import {
   DepartmentCO2Breakdown,
 } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+// Determine and normalize base API URL
+const getBaseApiUrl = (): string => {
+  let url = process.env.NEXT_PUBLIC_API_URL || process.env.VITE_API_URL || "https://ecocode-backend-si2i.onrender.com/api/v1";
+  
+  // Remove any trailing slashes
+  url = url.replace(/\/+$/, "");
+
+  // Guarantee that /api/v1 prefix is present
+  if (!url.endsWith("/api/v1")) {
+    url = `${url}/api/v1`;
+  }
+  return url;
+};
+
+export const API_BASE_URL = getBaseApiUrl();
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -33,7 +47,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/register")) {
+      if (
+        typeof window !== "undefined" &&
+        !window.location.pathname.startsWith("/login") &&
+        !window.location.pathname.startsWith("/register")
+      ) {
         logout();
       }
     }
@@ -41,7 +59,7 @@ api.interceptors.response.use(
   }
 );
 
-// Auth Service Calls
+// Auth Service Calls (Routes to ${API_BASE_URL}/auth/register -> https://ecocode-backend-si2i.onrender.com/api/v1/auth/register)
 export async function registerTenant(payload: {
   email: string;
   password: string;
@@ -52,6 +70,7 @@ export async function registerTenant(payload: {
   return res.data;
 }
 
+// Auth Service Calls (Routes to ${API_BASE_URL}/auth/login -> https://ecocode-backend-si2i.onrender.com/api/v1/auth/login)
 export async function loginUser(payload: {
   email: string;
   password: string;
