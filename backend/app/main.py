@@ -106,5 +106,4 @@ async def general_exception_handler(request: Request, exc: Exception):
         },
     )
 
-# Include API Router under /api/v1 prefix
-app.include_router(api_v1_router, prefix="/api/v1")
+app.include_router(api_v1_router, prefix="/api")
