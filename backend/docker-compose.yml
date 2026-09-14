@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecocode_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ecocode}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecocode_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-ecocode_db}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecocode} -d ${POSTGRES_DB:-ecocode_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
