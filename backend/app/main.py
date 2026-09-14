@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,6 +7,12 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1 import api_v1_router
 from app.core.config import settings
+from app.db.session import engine
+# আপনার মডেলগুলোর Base ইমপোর্ট করা হচ্ছে (যাতে সব টেবিল স্বয়ংক্রিয় তৈরি হতে পারে)
+try:
+    from app.models.base import Base
+except ImportError:
+    from app.db.base import Base
 
 openapi_tags = [
     {
@@ -26,13 +33,21 @@ openapi_tags = [
     },
 ]
 
+# Lifespan: অ্যাপ চালু হওয়ার সময় ডাটাবেসে টেবিল না থাকলে অটোমেটিক তৈরি করবে
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
 app = FastAPI(
     title="EcoCode Analytics API",
     description="Multi-tenant B2B SaaS platform for code-level carbon telemetry and green FinOps.",
     version="1.0.0",
     openapi_tags=openapi_tags,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS Middleware
@@ -106,4 +121,5 @@ async def general_exception_handler(request: Request, exc: Exception):
         },
     )
 
+# Include API Router under /api
 app.include_router(api_v1_router, prefix="/api")
