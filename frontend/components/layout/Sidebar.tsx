@@ -11,6 +11,7 @@ import {
   Leaf,
   LogOut,
   Building2,
+  Code2,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { getUser, logout } from "@/lib/auth";
@@ -20,6 +21,7 @@ const navItems = [
   { name: "Executive Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Workloads & Telemetry", href: "/workloads", icon: Cpu },
   { name: "API Key Management", href: "/keys", icon: KeyRound },
+  { name: "Quickstart & Integration", href: "/dashboard/integration", icon: Code2 },
   { name: "Organization & Tier", href: "/settings", icon: Settings },
 ];
 

@@ -3,8 +3,7 @@ import ssl
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
-# Replace [YOUR-PASSWORD] with your actual Supabase database password
-# Pooler URL (IPv4 সাপোর্টেড এবং রিলায়েবল)
+
 DATABASE_URL = "postgresql://postgres:lisK8z3Q0GfqmeX2@db.eubugzvpiahtpuhjmmbh.supabase.co:5432/postgres"
 
 # If using the pooler instead:
