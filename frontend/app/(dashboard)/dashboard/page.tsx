@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { MetricCards } from "@/components/dashboard/MetricCards";
 import { AlgorithmBarChart } from "@/components/dashboard/AlgorithmBarChart";
 import { DepartmentDonut } from "@/components/dashboard/DepartmentDonut";
+import { AIRecommendations } from "@/components/dashboard/AIRecommendations";
 import { WorkloadFilter } from "@/components/dashboard/WorkloadFilter";
 import { TimeRangeSelector } from "@/components/dashboard/TimeRangeSelector";
 import { Button } from "@/components/ui/Button";
@@ -144,6 +145,9 @@ export default function DashboardPage() {
             <AlgorithmBarChart rankings={rankings} isLoading={isLoading} />
           </div>
         </div>
+
+        {/* Smart Green FinOps Advisor Widget */}
+        <AIRecommendations />
       </main>
     </div>
   );

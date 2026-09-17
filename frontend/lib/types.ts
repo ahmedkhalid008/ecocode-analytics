@@ -79,3 +79,15 @@ export interface DepartmentCO2Breakdown {
   total_runs: number;
   percentage_of_total: number;
 }
+
+export interface RecommendationInsight {
+  id: string;
+  type: "latency" | "memory" | "healthy" | "optimization" | string;
+  severity: "CRITICAL" | "WARNING" | "HEALTHY" | "INFO" | string;
+  algorithm_name: string;
+  metric_value: string;
+  title: string;
+  insight: string;
+  action: string;
+  potential_saving: string;
+}

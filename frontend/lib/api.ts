@@ -8,6 +8,7 @@ import {
   AnalyticsSummary,
   WorkloadCO2Ranking,
   DepartmentCO2Breakdown,
+  RecommendationInsight,
 } from "./types";
 
 // Determine and normalize base API URL
@@ -123,5 +124,14 @@ export async function fetchAnalyticsByDepartment(params?: {
   workload_category?: string;
 }): Promise<DepartmentCO2Breakdown[]> {
   const res = await api.get<DepartmentCO2Breakdown[]>("/analytics/by-department", { params });
+  return res.data;
+}
+
+export async function fetchRecommendationInsights(apiKey?: string): Promise<RecommendationInsight[]> {
+  const headers: Record<string, string> = {};
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
+  }
+  const res = await api.get<RecommendationInsight[]>("/recommendations/insights", { headers });
   return res.data;
 }
